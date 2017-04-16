@@ -1,0 +1,120 @@
+.clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.body {
+  font-family: 'Open Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0288D1;
+  color: #FFFFFF;
+  width: 100vw;
+  height: 100vh;
+  .list-container {
+    width: 500px;
+    min-height: 250px;
+    background: #03A9F4;
+    padding: 20px;
+  }
+  .form-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .form-input {
+    width: 80%;
+    height: 33px;
+    float: left;
+    border: 0;
+    font-size: 14px;
+    color: #212121;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+  .form-submit {
+    width: 20%;
+    height: 35px;
+    border: 0;
+    background: #0288D1;
+    float: left;
+    text-align: center;
+    line-height: 35px;
+    font-size: 14px;
+  }
+  .list {
+    padding: 0;
+    margin: 0;
+    background: #0288D1;
+    list-style: none;
+    margin-bottom: 50px;
+  }
+  .list-item {
+    padding: 10px 20px 10px 10px;
+    font-size: 12px;
+    position: relative;
+    &:not(:last-child) {
+      border-bottom: 1px solid #FFFFFF;
+    }
+    &:hover {
+      .cancel-btn {
+        opacity: 1;
+      }
+    }
+  }
+  .cancel-btn {
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: red;
+    cursor: pointer;
+    span {
+      display: block;
+      background: #FFFFFF;
+      width: 65%;
+      height: 2px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -10px;
+      &:first-child {
+        transform: rotate(45deg);
+      }
+      &:last-child {
+        transform: rotate(-45deg);
+      }
+    }
+  }
+  .restore-container {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .restore-btn {
+    width: 200px;
+    height: 35px;
+    background: #0288D1;
+    text-align: center;
+    font-size: 14px;
+    color: #FFFFFF;
+    border: 0;
+    box-shadow: 0;
+    line-height: 35px;
+
+    &.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+}
