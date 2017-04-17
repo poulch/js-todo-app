@@ -111,8 +111,8 @@
       remove : removeElement,
       getAll : getList,
       restoreLast : restoreLast,
-      addToList : saveList,
-      getLastRemoved : getLastRemoved,
+      saveList : saveList,
+      getLastRemoved : getLastRemoved
 
     }
 
@@ -150,7 +150,7 @@
 
     var todos = todoApi.getAll();
     todos.push(value);
-    todoApi.addToList('todo', todos);
+    todoApi.saveList('todo', todos);
     todoApi.create(value);
   };
 
