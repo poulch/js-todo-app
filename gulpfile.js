@@ -1,3 +1,5 @@
+// przydałby się defaultowy task z browser-synciem
+
 var gulp = require('gulp'),
     sass = require('gulp-sass'),
     surcemap = require('gulp-sourcemaps');
@@ -31,6 +33,6 @@ gulp.task('watch', function () {
 
 gulp.task('build', ['sass']);
 
-gulp.task('default', function(){
+gulp.task('default', function(){ // ten task w sumie nic nie robi
   gulp.watch('sass/**/*.scss', ['sass']);
 });

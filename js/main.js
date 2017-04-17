@@ -1,3 +1,45 @@
+
+// moja propozycja struktury kodu
+var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pattern
+
+  function addItem (item) {
+    // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
+  }
+
+  function removeItem (index) {
+    // usuwa element z listy na danej pozycji
+  }
+
+  function restoreLastItem () {
+    // przywraca ostatni usunięty wpis
+  }
+
+  function saveCurrentList () {
+    // zapisuje obecną listę po np. dodaniu elementu czy jego usunięciu
+  }
+
+  function fetchSavedList () {
+    // pobiera i zwraca listę z localStorage/sessionStorage
+  }
+
+  function init(container) {
+    // tutaj tworzysz cały szkielet apki i wrzucasz go w podany container/div
+    // dodajesz te odpowiednie event listenery
+    // tylko tutaj był umieścił operacje na DOM
+  }
+
+  return { // tutaj zwracamy bardzo proste API bo posiadające tylko jedną metodę
+    init: init
+  }
+}();
+
+;(function () {
+  var mainTodoApp = todoApp.init('.jakis-tam-div');
+})();
+
+// ----------------------------------------------------------------------------
+
+
 ;(function() {
   'use strict';
 
