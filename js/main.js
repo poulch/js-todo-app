@@ -4,28 +4,93 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
 
   function addItem (item) {
     // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
+    var currentList = fetchSavedList();
+    currentList.push(item);
+    saveCurrentList(currentList);
   }
 
   function removeItem (index) {
     // usuwa element z listy na danej pozycji
+    var list = fetchSavedList();
+    var removeElement = list[index];
+    var lastRemoved = fetchLastRemoved();
+    fetchLastRemoved().unshift(removeElement);
+    list.splice(index, 1);
+    saveCurrentList(list);
   }
 
   function restoreLastItem () {
     // przywraca ostatni usunięty wpis
+    var removedArray = fetchLastRemoved();
+    var lastElement = removedArray.length = 1;
+    var currentList = fetchSavedList();
+    currentList.push(lastElement);
+    saveCurrentList()
   }
 
-  function saveCurrentList () {
-    // zapisuje obecną listę po np. dodaniu elementu czy jego usunięciu
+  function saveCurrentList (array) {
+    localStorage.setItem('todo', JSON.stringify(array));
+  }
+
+  function saveLastRemoved(array) {
+    localStorage.setItem('last', JSON.stringify(array));
   }
 
   function fetchSavedList () {
-    // pobiera i zwraca listę z localStorage/sessionStorage
+    var todo = [];
+    var todo_str = localStorage.getItem('todo');
+    if (todo_str !== null) {
+      todo = JSON.parse(todo_str);
+    }
+    return todo;
+  }
+
+  function fetchLastRemoved() {
+    var last = Array();
+    var lastString = localStorage.getItem('last');
+    if (lastString !== null) {
+      last = JSON.parse(lastString);
+    }
+    if (last.length > 2) {
+      last.length = 2;
+    }
+
+    return last;
+  }
+
+  function createListHtmlElement(container,value) {
+    var element = document.createElement('li'),
+        cancelBtn = document.createElement('div'),
+        span = document.createElement('span'),
+        span2 = document.createElement('span');
+
+    cancelBtn.classList.add('cancel-btn');
+    cancelBtn.appendChild(span);
+    cancelBtn.appendChild(span2);
+
+    element.classList.add('list-item');
+    element.textContent = value;
+    element.appendChild(cancelBtn);
+    container.appendChild(element);
   }
 
   function init(container) {
     // tutaj tworzysz cały szkielet apki i wrzucasz go w podany container/div
     // dodajesz te odpowiednie event listenery
     // tylko tutaj był umieścił operacje na DOM
+
+    var list = document.createElement('ul');
+    list.classList.add('list');
+
+    var savedList = fetchSavedList();
+
+    savedList.map(function(element) {
+      createListHtmlElement(list, element);
+    });
+
+
+
+
   }
 
   return { // tutaj zwracamy bardzo proste API bo posiadające tylko jedną metodę
@@ -34,7 +99,7 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
 }();
 
 ;(function () {
-  var mainTodoApp = todoApp.init('.jakis-tam-div');
+  var mainTodoApp = todoApp.init('.list-container');
 })();
 
 // ----------------------------------------------------------------------------
