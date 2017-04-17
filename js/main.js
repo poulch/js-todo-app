@@ -1,27 +1,28 @@
-
 // moja propozycja struktury kodu
 var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pattern
 
+
+  var todoList = fetchSavedList();
+  var lastRemoved = fetchLastRemoved();
+
   function addItem (item) {
     // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
-    var currentList = fetchSavedList();
-    currentList.push(item);
-    saveCurrentList(currentList);
+    todoList.push(item);
+    saveCurrentList(todoList);
   }
 
   function removeItem (index) {
     // usuwa element z listy na danej pozycji
-    var list = fetchSavedList();
-    var removeElement = list[index];
-    var lastRemoved = fetchLastRemoved();
-    fetchLastRemoved().unshift(removeElement);
-    list.splice(index, 1);
-    saveCurrentList(list);
+    var removeElement = todoList[index];
+    lastRemoved.unshift(removeElement);
+    todoList.splice(index, 1);
+    saveCurrentList(todoList);
+    saveLastRemoved(lastRemoved);
   }
 
   function restoreLastItem () {
     // przywraca ostatni usunięty wpis
-    var removedArray = fetchLastRemoved();
+    var removedArray = lastRemoved;
     var lastElement = removedArray.length = 1;
     var currentList = fetchSavedList();
     currentList.push(lastElement);
@@ -75,11 +76,10 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
   }
 
   function init(container) {
-    // tutaj tworzysz cały szkielet apki i wrzucasz go w podany container/div
-    // dodajesz te odpowiednie event listenery
-    // tylko tutaj był umieścił operacje na DOM
 
     var list = document.createElement('ul');
+    var form = document.querySelector('.form-container form');
+    var input = document.querySelector('.form-container input[name=title]');
     list.classList.add('list');
 
     var savedList = fetchSavedList();
@@ -88,24 +88,37 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
       createListHtmlElement(list, element);
     });
 
+    var con = document.querySelector(container);
+    con.appendChild(list);
 
 
+    function formSubmit(e) {
+      var list = document.querySelector('.list');
+      e.preventDefault();
+      var value = input.value;
+      input.value = '';
+      createListHtmlElement(list, value);
+     addItem(value);
+      
+    }
 
+
+    form.addEventListener('submit', formSubmit);
+    list.addEventListener('click', removeItemFormList);
   }
 
-  return { // tutaj zwracamy bardzo proste API bo posiadające tylko jedną metodę
+  return {
     init: init
   }
 }();
 
 ;(function () {
-  var mainTodoApp = todoApp.init('.list-container');
+  var mainTodoApp = todoApp.init('.todo-container');
 })();
-
 // ----------------------------------------------------------------------------
 
 
-;(function() {
+/*;(function() {
   'use strict';
 
   var container = document.querySelector('.list-container'),
@@ -280,4 +293,4 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     }
   });
 
-}());
+}());*/
