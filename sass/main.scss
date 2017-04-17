@@ -18,12 +18,13 @@
   background: #0288D1;
   color: #FFFFFF;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   .list-container {
     width: 500px;
     min-height: 250px;
     background: #03A9F4;
-    padding: 20px;
+    padding:  20px;
+    margin: 50px 0;
   }
   .form-container {
     width: 100%;
