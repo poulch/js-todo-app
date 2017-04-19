@@ -22,10 +22,11 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
 
   function restoreLastItem () {
     // przywraca ostatni usunięty wpis
-    var removedArray = lastRemoved;
-    var lastElement = removedArray.length = 1;
+    var lastElement = lastRemoved.splice(0, 1);
     var currentList = fetchSavedList();
     currentList.push(lastElement);
+    var listLenght = todoList.length;
+    createListHtmlElement(document.querySelector('.list'), lastElement, listLenght);
     saveCurrentList()
   }
 
@@ -59,7 +60,7 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     return last;
   }
 
-  function createListHtmlElement(container,value) {
+  function createListHtmlElement(container,value, index) {
     var element = document.createElement('li'),
         cancelBtn = document.createElement('div'),
         span = document.createElement('span'),
@@ -70,9 +71,35 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     cancelBtn.appendChild(span2);
 
     element.classList.add('list-item');
+    element.setAttribute('data-id', index);
     element.textContent = value;
     element.appendChild(cancelBtn);
     container.appendChild(element);
+  }
+
+  function removeItemFormList (element) {
+    var target = element.target;
+    var parent = null;
+
+
+
+    if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
+      parent = target.parentElement;
+      if (target.tagName === 'SPAN') {
+        parent = target.parentElement.parentElement;
+      }
+      var parentText = parent.textContent;
+      var id = parent.getAttribute('data-id');
+      var list = document.querySelector('.list');
+      var child = document.querySelector('.list-item[data-id="'+ id + '"]');
+
+      list.removeChild(child);
+
+      removeItem(id);
+
+
+
+    }
   }
 
   function init(container) {
@@ -84,8 +111,8 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
 
     var savedList = fetchSavedList();
 
-    savedList.map(function(element) {
-      createListHtmlElement(list, element);
+    savedList.map(function(element, index) {
+      createListHtmlElement(list, element, index);
     });
 
     var con = document.querySelector(container);
@@ -97,7 +124,8 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
       e.preventDefault();
       var value = input.value;
       input.value = '';
-      createListHtmlElement(list, value);
+      var listLeght = fetchSavedList().length;
+      createListHtmlElement(list, value, listLeght);
      addItem(value);
       
     }
