@@ -1,36 +1,44 @@
-// moja propozycja struktury kodu
-var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pattern
-
+var todoApp = function () { 
 
   var todoList = fetchSavedList();
   var lastRemoved = fetchLastRemoved();
+  
+ 
+  
 
-  function addItem (item) {
+  function addItem(item) {
     // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
     todoList.push(item);
     saveCurrentList(todoList);
   }
 
-  function removeItem (index) {
+  function removeItem(index) {
     // usuwa element z listy na danej pozycji
     var removeElement = todoList[index];
     lastRemoved.unshift(removeElement);
     todoList.splice(index, 1);
     saveCurrentList(todoList);
     saveLastRemoved(lastRemoved);
+
+    if (lastRemoved.length > 0 && lastRemoved.length < 2) {
+      createRestoreBtn();
+    }
   }
 
-  function restoreLastItem () {
+  function restoreLastItem() {
     // przywraca ostatni usunięty wpis
-    var lastElement = lastRemoved.splice(0, 1);
-    var currentList = fetchSavedList();
-    currentList.push(lastElement);
-    var listLenght = todoList.length;
-    createListHtmlElement(document.querySelector('.list'), lastElement, listLenght);
-    saveCurrentList()
+    if (lastRemoved.length > 0) {
+      var lastElement = lastRemoved[0];
+      var currentList = fetchSavedList();
+      currentList.push(lastElement);
+      var listLenght = todoList.length;
+      createListHtmlElement(document.querySelector('.list'), lastElement, listLenght);
+      saveCurrentList()
+    }
+   
   }
 
-  function saveCurrentList (array) {
+  function saveCurrentList(array) {
     localStorage.setItem('todo', JSON.stringify(array));
   }
 
@@ -38,10 +46,11 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     localStorage.setItem('last', JSON.stringify(array));
   }
 
-  function fetchSavedList () {
+  function fetchSavedList() {
     var todo = [];
     var todo_str = localStorage.getItem('todo');
-    if (todo_str !== null) {
+   
+    if (todo_str !== null && todo_str !== undefined) {
       todo = JSON.parse(todo_str);
     }
     return todo;
@@ -60,11 +69,11 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     return last;
   }
 
-  function createListHtmlElement(container,value, index) {
+  function createListHtmlElement(container, value, index) {
     var element = document.createElement('li'),
-        cancelBtn = document.createElement('div'),
-        span = document.createElement('span'),
-        span2 = document.createElement('span');
+      cancelBtn = document.createElement('div'),
+      span = document.createElement('span'),
+      span2 = document.createElement('span');
 
     cancelBtn.classList.add('cancel-btn');
     cancelBtn.appendChild(span);
@@ -77,7 +86,18 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     container.appendChild(element);
   }
 
-  function removeItemFormList (element) {
+  function createRestoreBtn() {
+    var restoreContainer = document.createElement('div');
+    restoreContainer.classList.add('restore-container');
+    var restoreBtn = document.createElement('button');
+    restoreBtn.classList.add('restore-btn');
+    restoreBtn.textContent = 'restore last task';
+    restoreContainer.appendChild(restoreBtn);
+    document.querySelector('.todo-container').appendChild(restoreContainer);
+
+  };
+
+  function removeItemFormList(element) {
     var target = element.target;
     var parent = null;
 
@@ -91,7 +111,7 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
       var parentText = parent.textContent;
       var id = parent.getAttribute('data-id');
       var list = document.querySelector('.list');
-      var child = document.querySelector('.list-item[data-id="'+ id + '"]');
+      var child = document.querySelector('.list-item[data-id="' + id + '"]');
 
       list.removeChild(child);
 
@@ -107,16 +127,24 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
     var list = document.createElement('ul');
     var form = document.querySelector('.form-container form');
     var input = document.querySelector('.form-container input[name=title]');
+    var restoreBtn;
     list.classList.add('list');
 
-    var savedList = fetchSavedList();
 
-    savedList.map(function(element, index) {
+
+
+
+    todoList.map(function (element, index) {
       createListHtmlElement(list, element, index);
     });
 
     var con = document.querySelector(container);
     con.appendChild(list);
+
+    if (lastRemoved.length > 0) {
+      createRestoreBtn();
+      restoreBtn = document.querySelector('.restore-btn');
+    }
 
 
     function formSubmit(e) {
@@ -126,13 +154,14 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
       input.value = '';
       var listLeght = fetchSavedList().length;
       createListHtmlElement(list, value, listLeght);
-     addItem(value);
-      
+      addItem(value);
+
     }
 
 
     form.addEventListener('submit', formSubmit);
     list.addEventListener('click', removeItemFormList);
+    restoreBtn.addEventListener('click', restoreLastItem);
   }
 
   return {
@@ -140,185 +169,10 @@ var todoApp = function () { // tutaj masz wykorzystanie tzw. revealing module pa
   }
 }();
 
-;(function () {
+;
+(function () {
   var mainTodoApp = todoApp.init('.todo-container');
 })();
-// ----------------------------------------------------------------------------
-
-
-/*;(function() {
-  'use strict';
-
-  var container = document.querySelector('.list-container'),
-      list = document.querySelector('.list'),
-      form = document.querySelector('.form-container form'),
-      input = document.querySelector('.form-container input[name=title]'),
-      restoreBtn;
 
 
 
-  var todoApi = (function() {
-
-    var lastRemove = [];
-    var list = document.querySelector('.list');
-
-    var getList = function() {
-      var todos = [];
-      var todos_str = localStorage.getItem('todo');
-      if (todos_str !== null) {
-        todos = JSON.parse(todos_str);
-      }
-      return todos;
-    };
-
-    var saveList = function(name, array) {
-      localStorage.setItem(name, JSON.stringify(array));
-    };
-
-    var removeElement = function(element) {
-      var target = element.target;
-      var parent = null;
-      var restoreBtn = document.querySelector('.restore-btn');
-
-      if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
-        parent = target.parentElement;
-        if (target.tagName === 'SPAN') {
-          parent = target.parentElement.parentElement;
-        }
-
-        var parentText = parent.textContent;
-
-        lastRemove.unshift(parentText);
-        list.removeChild(parent);
-        saveList('last', lastRemove);
-
-        var todos = getList();
-        var newTodos = todos.filter(function(element) {
-          return element !== parentText;
-        });
-        saveList('todo', newTodos);
-
-        if (!restoreBtn) {
-          createRestoreBtn();
-        } else {
-          restoreBtn.classList.remove('hidden');
-        }
-
-      }
-    };
-
-    var createElement = function(value) {
-      var element = document.createElement('li'),
-          cancelBtn = document.createElement('div'),
-          span = document.createElement('span'),
-          span2 = document.createElement('span');
-
-      cancelBtn.classList.add('cancel-btn');
-      cancelBtn.appendChild(span);
-      cancelBtn.appendChild(span2);
-
-      element.classList.add('list-item');
-      element.textContent = value;
-      element.appendChild(cancelBtn);
-      list.appendChild(element);
-    };
-
-    var getLastRemoved = function() {
-      var last = Array();
-      var lastString = localStorage.getItem('last');
-      if (lastString !== null) {
-        last = JSON.parse(lastString);
-      }
-      if (last.length > 2) {
-        last.length = 2;
-      }
-
-      return last;
-
-    };
-
-    var restoreLast = function() {
-      var last = getLastRemoved();
-      var itemInList = getList();
-      var restoreBtn = document.querySelector('.restore-btn');
-      restoreBtn.classList.add('hidden');
-
-      last.forEach(function(element) {
-        createElement(element);
-        itemInList.push(element);
-      });
-
-      saveList('todo', itemInList);
-      saveList('last', Array());
-    };
-
-
-
-    return {
-      create : createElement,
-      remove : removeElement,
-      getAll : getList,
-      restoreLast : restoreLast,
-      saveList : saveList,
-      getLastRemoved : getLastRemoved
-
-    }
-
-
-  })();
-
-
-
-  var createRestoreBtn = function() {
-    var restoreContainer = document.createElement('div');
-    restoreContainer.classList.add('restore-container');
-
-    var restoreBtn = document.createElement('button');
-    restoreBtn.classList.add('restore-btn');
-    restoreBtn.classList.add('hidden');
-    restoreBtn.textContent = 'restore last 2 task';
-    restoreContainer.appendChild(restoreBtn);
-    container.appendChild(restoreContainer);
-
-    restoreBtn = document.querySelector('.restore-btn');
-    restoreBtn.addEventListener('click', restoreLast);
-  };
-
-  var initListFromStorage = function() {
-    var listItem = todoApi.getAll();
-    listItem.forEach(function(element) {
-      todoApi.create(element);
-    });
-  };
-
-  var formSubmit = function(e) {
-    e.preventDefault();
-    var value = input.value;
-    input.value = '';
-
-    var todos = todoApi.getAll();
-    todos.push(value);
-    todoApi.saveList('todo', todos);
-    todoApi.create(value);
-  };
-
-
-
-
-
-
-
-  document.addEventListener('DOMContentLoaded', function() {
-    form.addEventListener('submit', formSubmit);
-    list.addEventListener('click', todoApi.remove());
-    initListFromStorage();
-    createRestoreBtn();
-    var restoreBtn = document.querySelector('.restore-btn');
-    var lastRemove = todoApi.getLastRemoved;
-
-    if (lastRemove.length !== 0) {
-      restoreBtn.classList.remove('hidden');
-    }
-  });
-
-}());*/
