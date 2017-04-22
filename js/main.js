@@ -1,10 +1,7 @@
-var todoApp = function () { 
+var todoApp = function() {
 
   var todoList = fetchSavedList();
   var lastRemoved = fetchLastRemoved();
-  
- 
-  
 
   function addItem(item) {
     // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
@@ -21,21 +18,31 @@ var todoApp = function () {
     saveLastRemoved(lastRemoved);
 
     if (lastRemoved.length > 0 && lastRemoved.length < 2) {
-      createRestoreBtn();
+      var restoreBtn = document.querySelector('.restore-btn');
+      console.log(restoreBtn);
+      if (!restoreBtn) {
+        createRestoreBtn();
+        restoreBtn = document.querySelector('.restore-btn');
+        restoreBtn.addEventListener('click', restoreLastItem);
+      }
+
     }
   }
 
   function restoreLastItem() {
     // przywraca ostatni usunięty wpis
     if (lastRemoved.length > 0) {
-      var lastElement = lastRemoved[0];
+
+      var removedElement = lastRemoved.splice(0, 1);
       var currentList = fetchSavedList();
-      currentList.push(lastElement);
+      currentList.push(removedElement);
       var listLenght = todoList.length;
-      createListHtmlElement(document.querySelector('.list'), lastElement, listLenght);
-      saveCurrentList()
+      createListHtmlElement(document.querySelector('.list'), lastElement,
+          listLenght);
+      saveCurrentList(currentList);
+      saveLastRemoved(lastRemoved);
     }
-   
+
   }
 
   function saveCurrentList(array) {
@@ -49,7 +56,7 @@ var todoApp = function () {
   function fetchSavedList() {
     var todo = [];
     var todo_str = localStorage.getItem('todo');
-   
+
     if (todo_str !== null && todo_str !== undefined) {
       todo = JSON.parse(todo_str);
     }
@@ -71,9 +78,9 @@ var todoApp = function () {
 
   function createListHtmlElement(container, value, index) {
     var element = document.createElement('li'),
-      cancelBtn = document.createElement('div'),
-      span = document.createElement('span'),
-      span2 = document.createElement('span');
+        cancelBtn = document.createElement('div'),
+        span = document.createElement('span'),
+        span2 = document.createElement('span');
 
     cancelBtn.classList.add('cancel-btn');
     cancelBtn.appendChild(span);
@@ -101,14 +108,11 @@ var todoApp = function () {
     var target = element.target;
     var parent = null;
 
-
-
     if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
       parent = target.parentElement;
       if (target.tagName === 'SPAN') {
         parent = target.parentElement.parentElement;
       }
-      var parentText = parent.textContent;
       var id = parent.getAttribute('data-id');
       var list = document.querySelector('.list');
       var child = document.querySelector('.list-item[data-id="' + id + '"]');
@@ -116,8 +120,6 @@ var todoApp = function () {
       list.removeChild(child);
 
       removeItem(id);
-
-
 
     }
   }
@@ -130,11 +132,7 @@ var todoApp = function () {
     var restoreBtn;
     list.classList.add('list');
 
-
-
-
-
-    todoList.map(function (element, index) {
+    todoList.map(function(element, index) {
       createListHtmlElement(list, element, index);
     });
 
@@ -144,8 +142,8 @@ var todoApp = function () {
     if (lastRemoved.length > 0) {
       createRestoreBtn();
       restoreBtn = document.querySelector('.restore-btn');
+      restoreBtn.addEventListener('click', restoreLastItem);
     }
-
 
     function formSubmit(e) {
       var list = document.querySelector('.list');
@@ -158,19 +156,18 @@ var todoApp = function () {
 
     }
 
-
     form.addEventListener('submit', formSubmit);
     list.addEventListener('click', removeItemFormList);
-    restoreBtn.addEventListener('click', restoreLastItem);
+
   }
 
   return {
-    init: init
-  }
+    init: init,
+  };
 }();
 
 ;
-(function () {
+(function() {
   var mainTodoApp = todoApp.init('.todo-container');
 })();
 
