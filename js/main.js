@@ -1,46 +1,44 @@
-var todoApp = function() {
+var todoApp = function () {
 
-  var todoList = fetchSavedList();
-  var lastRemoved = fetchLastRemoved();
+  var todoList = fetchSavedList(),
+      lastRemoved = fetchLastRemoved(),
+      form = document.querySelector('.form-container form'),
+      input = document.querySelector('.form-container input[name=title]');
 
   function addItem(item) {
-    // podajesz obiekt czy tam string i ta funkcja ma za zadanie wrzucić go do listy
     todoList.push(item);
     saveCurrentList(todoList);
   }
 
-  function removeItem(index) {
-    // usuwa element z listy na danej pozycji
-    var removeElement = todoList[index];
-    lastRemoved.unshift(removeElement);
-    todoList.splice(index, 1);
+  function removeItem(value) {
+    
+    var index = todoList.indexOf(value);
+    var removedElement = todoList.splice(index, 1);
+    lastRemoved.unshift(removedElement[0]);
     saveCurrentList(todoList);
     saveLastRemoved(lastRemoved);
 
-    if (lastRemoved.length > 0 && lastRemoved.length < 2) {
-      var restoreBtn = document.querySelector('.restore-btn');
-      console.log(restoreBtn);
-      if (!restoreBtn) {
-        createRestoreBtn();
-        restoreBtn = document.querySelector('.restore-btn');
-        restoreBtn.addEventListener('click', restoreLastItem);
+    if (lastRemoved.length > 0) {
+      if (restoreBtnElement.classList.contains('hidden')) {
+        restoreBtnElement.classList.remove('hidden');
       }
 
     }
   }
 
-  function restoreLastItem() {
-    // przywraca ostatni usunięty wpis
+  function restoreLastItem(element) {
+    
     if (lastRemoved.length > 0) {
-
+      var itemListElement = document.querySelector('ul');
       var removedElement = lastRemoved.splice(0, 1);
-      var currentList = fetchSavedList();
-      currentList.push(removedElement);
-      var listLenght = todoList.length;
-      createListHtmlElement(document.querySelector('.list'), lastElement,
-          listLenght);
-      saveCurrentList(currentList);
+      todoList.push(removedElement[0]);
+      var listItem =  createListHtmlElement(removedElement[0]);
+      itemListElement.appendChild(listItem);
+      
+      saveCurrentList(todoList);
       saveLastRemoved(lastRemoved);
+    } else {
+      element.target.classList.add('hidden');
     }
 
   }
@@ -76,8 +74,8 @@ var todoApp = function() {
     return last;
   }
 
-  function createListHtmlElement(container, value, index) {
-    var element = document.createElement('li'),
+  function createListHtmlElement(value) {
+    var listItem = document.createElement('li'),
         cancelBtn = document.createElement('div'),
         span = document.createElement('span'),
         span2 = document.createElement('span');
@@ -86,11 +84,10 @@ var todoApp = function() {
     cancelBtn.appendChild(span);
     cancelBtn.appendChild(span2);
 
-    element.classList.add('list-item');
-    element.setAttribute('data-id', index);
-    element.textContent = value;
-    element.appendChild(cancelBtn);
-    container.appendChild(element);
+    listItem.classList.add('list-item');
+    listItem.textContent = value;
+    listItem.appendChild(cancelBtn);
+    return listItem;
   }
 
   function createRestoreBtn() {
@@ -100,64 +97,68 @@ var todoApp = function() {
     restoreBtn.classList.add('restore-btn');
     restoreBtn.textContent = 'restore last task';
     restoreContainer.appendChild(restoreBtn);
-    document.querySelector('.todo-container').appendChild(restoreContainer);
+    return restoreContainer;
 
   };
 
   function removeItemFormList(element) {
     var target = element.target;
     var parent = null;
+    var itemListElement = document.querySelector('ul');
 
     if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
       parent = target.parentElement;
       if (target.tagName === 'SPAN') {
         parent = target.parentElement.parentElement;
       }
-      var id = parent.getAttribute('data-id');
-      var list = document.querySelector('.list');
-      var child = document.querySelector('.list-item[data-id="' + id + '"]');
-
-      list.removeChild(child);
-
-      removeItem(id);
-
+      itemListElement.removeChild(parent);
+      removeItem(parent.textContent);
     }
   }
 
   function init(container) {
-
-    var list = document.createElement('ul');
-    var form = document.querySelector('.form-container form');
-    var input = document.querySelector('.form-container input[name=title]');
-    var restoreBtn;
-    list.classList.add('list');
-
-    todoList.map(function(element, index) {
-      createListHtmlElement(list, element, index);
+    var container = document.querySelector(container),
+        itemList = document.createElement('ul'),
+        resoreBtn =  createRestoreBtn(),
+        list = document.querySelector('.list');
+    
+    itemList.classList.add('list');
+    var listItems = document.createDocumentFragment();
+    todoList.forEach(function (element) {
+      listItems.appendChild(createListHtmlElement(element));
     });
-
-    var con = document.querySelector(container);
-    con.appendChild(list);
+  
+    itemList.appendChild(listItems);
+    container.appendChild(itemList);
+    
+    
+  
+//RESTORE ITEMS
+    
+    document.querySelector('.todo-container').appendChild(resoreBtn);
+    restoreBtnElement = document.querySelector('.restore-btn');
+    restoreBtnElement.classList.add('hidden');
+    restoreBtnElement.addEventListener('click', restoreLastItem);
+  
 
     if (lastRemoved.length > 0) {
-      createRestoreBtn();
-      restoreBtn = document.querySelector('.restore-btn');
-      restoreBtn.addEventListener('click', restoreLastItem);
+      restoreBtnElement.classList.remove('hidden');
     }
 
     function formSubmit(e) {
-      var list = document.querySelector('.list');
       e.preventDefault();
       var value = input.value;
       input.value = '';
-      var listLeght = fetchSavedList().length;
-      createListHtmlElement(list, value, listLeght);
-      addItem(value);
+      var listElement = createListHtmlElement(value);
+      itemList.appendChild(listElement);
+      
+      todoList.push(value);
+      saveCurrentList(todoList);
 
     }
 
     form.addEventListener('submit', formSubmit);
-    list.addEventListener('click', removeItemFormList);
+    itemList.addEventListener('click', removeItemFormList);
 
   }
 
@@ -167,9 +168,6 @@ var todoApp = function() {
 }();
 
 ;
-(function() {
+(function () {
   var mainTodoApp = todoApp.init('.todo-container');
 })();
-
-
-

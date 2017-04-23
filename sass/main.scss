@@ -112,6 +112,12 @@
     border: 0;
     box-shadow: 0;
     line-height: 35px;
+    opacity: 1;
+    transition: opacity .3s ease-in-out;
+    
+    &.hidden {
+      opacity: 0;
+    }
 
     
   }
