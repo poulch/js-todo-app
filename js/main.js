@@ -32,11 +32,10 @@ var todoApp = function() {
     if (lastRemoved.length > 0) {
       var listHtml = document.querySelector('.list');
       var removedElement = lastRemoved.splice(0, 1);
-      todoList.push(removedElement[0]);
       var listItem = createListHtmlElement(removedElement[0]);
       listHtml.appendChild(listItem);
 
-      saveCurrentList(todoList);
+      addItem(removedElement[0]);
       saveLastRemoved(lastRemoved);
     } else {
       element.target.classList.add('hidden');
@@ -151,10 +150,7 @@ var todoApp = function() {
       input.value = '';
       var listElement = createListHtmlElement(value);
       listHtml.appendChild(listElement);
-
-      todoList.push(value);
-      saveCurrentList(todoList);
-
+      addItem(value);
     }
 
     form.addEventListener('submit', formSubmit);
