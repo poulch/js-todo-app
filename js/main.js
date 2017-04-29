@@ -1,9 +1,10 @@
-var todoApp = function () {
+var todoApp = function() {
 
   var todoList = fetchSavedList(),
       lastRemoved = fetchLastRemoved(),
       form = document.querySelector('.form-container form'),
-      input = document.querySelector('.form-container input[name=title]');
+      input = document.querySelector('.form-container input[name=title]'),
+      restoreBtnElement;
 
   function addItem(item) {
     todoList.push(item);
@@ -11,9 +12,9 @@ var todoApp = function () {
   }
 
   function removeItem(value) {
-    
-    var index = todoList.indexOf(value);
-    var removedElement = todoList.splice(index, 1);
+
+    var indexRemovedElement = todoList.indexOf(value);
+    var removedElement = todoList.splice(indexRemovedElement, 1);
     lastRemoved.unshift(removedElement[0]);
     saveCurrentList(todoList);
     saveLastRemoved(lastRemoved);
@@ -27,14 +28,14 @@ var todoApp = function () {
   }
 
   function restoreLastItem(element) {
-    
+
     if (lastRemoved.length > 0) {
-      var itemListElement = document.querySelector('ul');
+      var listHtml = document.querySelector('.list');
       var removedElement = lastRemoved.splice(0, 1);
       todoList.push(removedElement[0]);
-      var listItem =  createListHtmlElement(removedElement[0]);
-      itemListElement.appendChild(listItem);
-      
+      var listItem = createListHtmlElement(removedElement[0]);
+      listHtml.appendChild(listItem);
+
       saveCurrentList(todoList);
       saveLastRemoved(lastRemoved);
     } else {
@@ -91,9 +92,10 @@ var todoApp = function () {
   }
 
   function createRestoreBtn() {
-    var restoreContainer = document.createElement('div');
+    var restoreContainer = document.createElement('div'),
+        restoreBtn = document.createElement('button');
+
     restoreContainer.classList.add('restore-container');
-    var restoreBtn = document.createElement('button');
     restoreBtn.classList.add('restore-btn');
     restoreBtn.textContent = 'restore last task';
     restoreContainer.appendChild(restoreBtn);
@@ -104,42 +106,40 @@ var todoApp = function () {
   function removeItemFormList(element) {
     var target = element.target;
     var parent = null;
-    var itemListElement = document.querySelector('ul');
+    //var listHtml = document.querySelector('ul');
 
     if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
       parent = target.parentElement;
       if (target.tagName === 'SPAN') {
         parent = target.parentElement.parentElement;
       }
-      itemListElement.removeChild(parent);
+      this.removeChild(parent);
       removeItem(parent.textContent);
     }
   }
 
   function init(container) {
-    var container = document.querySelector(container),
-        itemList = document.createElement('ul'),
-        resoreBtn =  createRestoreBtn(),
-        list = document.querySelector('.list');
-    
-    itemList.classList.add('list');
+    var todoContainer = document.querySelector(container),
+        listElement = document.createElement('ul'),
+        restoreBtn = createRestoreBtn();
+
+    listElement.classList.add('list');
+    todoContainer.appendChild(listElement);
+    var listHtml = document.querySelector('.list');
+
+
     var listItems = document.createDocumentFragment();
-    todoList.forEach(function (element) {
+    todoList.forEach(function(element) {
       listItems.appendChild(createListHtmlElement(element));
     });
-  
-    itemList.appendChild(listItems);
-    container.appendChild(itemList);
-    
-    
-  
+    listHtml.appendChild(listItems);
+
 //RESTORE ITEMS
-    
-    document.querySelector('.todo-container').appendChild(resoreBtn);
-    restoreBtnElement = document.querySelector('.restore-btn');
+
+    document.querySelector('.todo-container').appendChild(restoreBtn);
+     restoreBtnElement = document.querySelector('.restore-btn');
     restoreBtnElement.classList.add('hidden');
     restoreBtnElement.addEventListener('click', restoreLastItem);
-  
 
     if (lastRemoved.length > 0) {
       restoreBtnElement.classList.remove('hidden');
@@ -150,24 +150,24 @@ var todoApp = function () {
       var value = input.value;
       input.value = '';
       var listElement = createListHtmlElement(value);
-      itemList.appendChild(listElement);
-      
+      listHtml.appendChild(listElement);
+
       todoList.push(value);
       saveCurrentList(todoList);
 
     }
 
     form.addEventListener('submit', formSubmit);
-    itemList.addEventListener('click', removeItemFormList);
+    listHtml.addEventListener('click', removeItemFormList);
 
   }
 
   return {
-    init: init,
+    init: init
   };
 }();
 
-;
-(function () {
+
+(function() {
   var mainTodoApp = todoApp.init('.todo-container');
 })();
