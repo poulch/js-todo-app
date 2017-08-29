@@ -17,8 +17,8 @@ class todoClass {
     this.saveList(this.todoList);
   }
   removeItem(value) {
-    var indexRemovedElement = this.todoList.indexOf(value);
-    var removedElement = this.todoList.splice(indexRemovedElement, 1);
+    const indexRemovedElement = this.todoList.indexOf(value);
+    const removedElement = this.todoList.splice(indexRemovedElement, 1);
     this.restoreBtn = document.querySelector('.restore-btn');
     this.lastRemoved.unshift(removedElement[0]);
     this.saveList(this.todoList);
@@ -32,17 +32,15 @@ class todoClass {
     }
   }
   fetchList() {
-    var todoArray = [];
-    var todo_str = localStorage.getItem('todo');
+    let todoArray = [];
+    const todo_str = localStorage.getItem('todo');
     todo_str ? todoArray = JSON.parse(todo_str) : [];
     return todoArray;
   }
   fetchRemoved() {
-    var last = Array();
-    var lastString = localStorage.getItem('last');
-    if (lastString !== null) {
-      last = JSON.parse(lastString);
-    }
+    let last = [];
+    const lastString = localStorage.getItem('last');
+    lastString ? last = JSON.parse(lastString) : [];
     if (last.length > 2) {
       last.length = 2;
     }
@@ -51,15 +49,14 @@ class todoClass {
   }
   saveList(list) {
     localStorage.setItem('todo', JSON.stringify(list));
-
   }
   saveRemoved(array) {
     localStorage.setItem('last', JSON.stringify(array));
   }
   restoreLastItem(element) {
     if (this.lastRemoved.length > 0) {
-      var removedElement = this.lastRemoved.splice(0, 1);
-      var listItem = this.createListItem(removedElement[0]);
+      const removedElement = this.lastRemoved.splice(0, 1);
+      const listItem = this.createListItem(removedElement[0]);
       this.list.appendChild(listItem);
       this.addItem(removedElement[0]);
       this.saveRemoved(this.lastRemoved);
@@ -68,10 +65,10 @@ class todoClass {
     }
   }
   createListItem(value) {
-    var listItem = document.createElement('li'),
-      cancelBtn = document.createElement('div'),
-      span = document.createElement('span'),
-      span2 = document.createElement('span');
+    const listItem = document.createElement('li');
+    const cancelBtn = document.createElement('div');
+    const span = document.createElement('span');
+    const span2 = document.createElement('span');
 
     cancelBtn.classList.add('cancel-btn');
     cancelBtn.appendChild(span);
@@ -84,8 +81,8 @@ class todoClass {
     return listItem;
   }
   createRestoreBtn() {
-    var restoreContainer = document.createElement('div'),
-      restoreBtn = document.createElement('button');
+    const restoreContainer = document.createElement('div');
+    const restoreBtn = document.createElement('button');
 
     restoreContainer.classList.add('restore-container');
     restoreBtn.classList.add('restore-btn');
@@ -94,8 +91,8 @@ class todoClass {
     return restoreContainer;
   }
   removeElementFromDOM(element) {
-    var target = element.target;
-    var parent = null;
+    const target = element.target;
+    let parent = null;
 
     if (target.nodeName === 'DIV' || target.nodeName === 'SPAN') {
       parent = target.parentElement;
@@ -108,28 +105,27 @@ class todoClass {
   }
   formSubmit(e) {
     e.preventDefault();
-    var value = this.input.value;
+    const value = this.input.value;
     this.input.value = '';
-    var listElement = this.createListItem(value);
-    this.list.appendChild(listElement);
+    this.list.appendChild(this.createListItem(value));
     this.addItem(value);
   }
   init(container) {
-    var todoContainer = document.querySelector(container),
-      unorderList = document.createElement('ul'),
-      restoreBtn = this.createRestoreBtn();
+    const todoContainer = document.querySelector(container);
+    const unorderList = document.createElement('ul');
+    const restoreBtn = this.createRestoreBtn();
 
     unorderList.classList.add('list');
     todoContainer.appendChild(unorderList);
     this.list = unorderList;
 
 
-    var listItems = document.createDocumentFragment();
-    var createLi = this.createListItem.bind(this);
+    const listItemsFragment = document.createDocumentFragment();
+    const createLI = this.createListItem.bind(this);
     this.todoList.forEach(function (element) {
-      listItems.appendChild(createLi(element));
+      listItemsFragment.appendChild(createLI(element));
     });
-    this.list.appendChild(listItems);
+    this.list.appendChild(listItemsFragment);
 
     document.querySelector('.todo-container').appendChild(restoreBtn);
     this.restoreBtn = document.querySelector('.restore-btn');

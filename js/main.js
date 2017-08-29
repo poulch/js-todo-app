@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-  var todoApp = new todoClass();
+document.addEventListener('DOMContentLoaded', function () {
+  const todoApp = new todoClass();
   todoApp.init('.todo-container');
 });
